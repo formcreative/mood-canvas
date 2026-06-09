@@ -1,0 +1,166 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --glass-strong: rgba(255, 255, 255, 0.25);
+  --hairline: rgba(255, 255, 255, 0.28);
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; min-height: 100%; margin: 0; }
+body { background: #030712; overflow-x: hidden; }
+button, input { font: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+
+.app {
+  align-items: center;
+  display: flex;
+  isolation: isolate;
+  justify-content: center;
+  min-height: 100svh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+  position: relative;
+}
+
+.mood-background { inset: 0; overflow: hidden; position: fixed; z-index: -3; }
+.mood-background::after {
+  animation: gradient-breathe 14s ease-in-out infinite alternate;
+  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.22), transparent 26%), radial-gradient(circle at 65% 70%, rgba(255,255,255,.12), transparent 32%);
+  content: "";
+  filter: blur(38px);
+  inset: -12%;
+  opacity: .55;
+  position: absolute;
+}
+
+.gradient-orb { animation: float-orb 18s ease-in-out infinite alternate; border-radius: 999px; filter: blur(64px); height: 42vmax; opacity: .28; position: absolute; width: 42vmax; }
+.gradient-orb-one { background: rgba(255,255,255,.36); left: -18vmax; top: -12vmax; }
+.gradient-orb-two { animation-delay: -8s; background: rgba(255,255,255,.2); bottom: -20vmax; right: -14vmax; }
+.grain { background-image: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px); background-size: 46px 46px; inset: 0; mask-image: radial-gradient(circle, black 0%, transparent 78%); opacity: .2; position: absolute; }
+
+.content-shell { align-items: center; display: flex; flex-direction: column; margin-inline: auto; max-width: 920px; padding-block: 38px; position: relative; text-align: center; width: min(100%, 920px); z-index: 2; }
+.eyebrow { font-size: .78rem; font-weight: 700; letter-spacing: .18em; margin: 0 0 16px; text-transform: uppercase; }
+h1 { font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; font-size: clamp(1.85rem, 7.2vw, 4.75rem); font-weight: 650; letter-spacing: 0; line-height: .96; margin: 0 0 32px; max-width: 920px; text-wrap: balance; }
+
+.mood-input { align-items: center; backdrop-filter: blur(28px) saturate(1.35); background: linear-gradient(135deg, rgba(255,255,255,.23), rgba(255,255,255,.1)); border: 1px solid var(--hairline); border-radius: 999px; box-shadow: 0 26px 80px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.3); display: flex; gap: 8px; max-width: 610px; padding: 7px; position: relative; width: min(100%, 610px); }
+.mood-input input { background: transparent; border: 0; color: currentColor; flex: 1; min-width: 0; outline: 0; padding: 14px 10px 14px 18px; }
+.mood-input input::placeholder { color: currentColor; opacity: .58; }
+.mood-input:focus-within { border-color: rgba(255,255,255,.48); box-shadow: 0 26px 80px rgba(0,0,0,.24), 0 0 0 1px rgba(255,255,255,.18), inset 0 1px 0 rgba(255,255,255,.34); }
+.mood-input button, .wallpaper-button { border: 0; border-radius: 999px; color: #0b1020; cursor: pointer; font-weight: 800; transition: transform 180ms ease, opacity 180ms ease, background 240ms ease; }
+.mood-input button { min-height: 46px; padding: 0 18px; }
+.mood-input button:focus-visible, .wallpaper-button:focus-visible, .emotion-chip:focus-visible, .mood-input input:focus-visible { outline: 3px solid rgba(255,255,255,.78); outline-offset: 4px; }
+.mood-input button:hover, .wallpaper-button:hover { transform: translateY(-1px); }
+.mood-input button:active, .wallpaper-button:active, .emotion-chip:active { transform: translateY(1px) scale(.99); }
+
+.response-message { font-size: clamp(1rem, 3.4vw, 1.22rem); line-height: 1.6; margin: 12px 0 20px; max-width: 560px; opacity: .9; }
+.emotion-chips { display: flex; flex-wrap: wrap; gap: 9px; justify-content: center; margin: 0 auto 24px; max-width: 720px; }
+.emotion-chip { backdrop-filter: blur(18px); background: rgba(255,255,255,.11); border: 1px solid rgba(255,255,255,.2); border-radius: 999px; color: currentColor; cursor: pointer; font-size: .9rem; font-weight: 700; opacity: .92; padding: 9px 13px; transition: transform 180ms ease, border-color 180ms ease, background 180ms ease; }
+.emotion-chip:hover { background: rgba(255,255,255,.18); transform: translateY(-1px); }
+.wallpaper-panel { align-items: center; display: flex; flex-direction: column; gap: 12px; margin-top: 2px; }
+.wallpaper-button { background: rgba(255,255,255,.9); box-shadow: 0 20px 45px rgba(0,0,0,.18); font-size: .9rem; min-height: 43px; padding: 0 20px; }
+.wallpaper-panel p { font-size: .9rem; line-height: 1.55; margin: 0; max-width: 340px; opacity: .74; }
+
+.particle-layer { inset: 0; overflow: hidden; pointer-events: none; position: absolute; z-index: 1; }
+.mood-glyph-layer { inset: 0; opacity: .72; position: absolute; }
+.mood-glyph, .particle { --accent: rgba(255,255,255,.8); --delay: 0s; --duration: 10s; animation-delay: var(--delay); animation-duration: var(--duration); animation-iteration-count: infinite; animation-timing-function: ease-in-out; opacity: .35; position: absolute; transform: translateZ(0); will-change: opacity, transform; }
+.mood-glyph { --rotation: 0deg; --width: 120px; transform: rotate(var(--rotation)) translateZ(0); }
+.particle { --size: 10px; background: var(--accent); border-radius: 999px; box-shadow: 0 0 24px var(--accent); height: var(--size); opacity: .58; width: var(--size); }
+
+.glyph-jitter { animation-name: anxious-line-shake; background: linear-gradient(90deg, transparent, var(--accent), transparent); box-shadow: 0 0 18px var(--accent); height: 1px; opacity: .42; width: var(--width); }
+.glyph-waves { animation-name: wave-ribbon-flow; border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent); border-color: transparent transparent var(--accent) transparent; border-radius: 50%; height: 48px; opacity: .22; width: var(--width); }
+.glyph-embers { animation-name: heat-flare; background: linear-gradient(180deg, transparent, var(--accent), transparent); border-radius: 999px; filter: blur(1px); height: calc(var(--width) * .72); opacity: .24; width: 2px; }
+.glyph-sparkles, .glyph-bursts { animation-name: burst-pop; height: 38px; opacity: .32; width: 38px; }
+.glyph-sparkles::before, .glyph-sparkles::after, .glyph-bursts::before, .glyph-bursts::after { background: var(--accent); border-radius: 999px; box-shadow: 0 0 18px var(--accent); content: ""; left: 50%; position: absolute; top: 50%; transform: translate(-50%, -50%); }
+.glyph-sparkles::before, .glyph-bursts::before { height: 2px; width: 100%; }
+.glyph-sparkles::after, .glyph-bursts::after { height: 100%; width: 2px; }
+.glyph-mist, .glyph-blur { animation-name: fog-bank; background: var(--accent); border-radius: 999px; filter: blur(22px); height: 42px; opacity: .14; width: calc(var(--width) * 1.2); }
+.glyph-bokeh { animation-name: bokeh-breathe; border: 1px solid var(--accent); border-radius: 999px; box-shadow: inset 0 0 24px color-mix(in srgb, var(--accent) 35%, transparent), 0 0 30px color-mix(in srgb, var(--accent) 30%, transparent); height: calc(var(--width) * .42); opacity: .24; width: calc(var(--width) * .42); }
+.glyph-rise { animation-name: upward-thread; background: linear-gradient(180deg, transparent, var(--accent)); border-radius: 999px; height: calc(var(--width) * .86); opacity: .26; width: 2px; }
+.glyph-orbit { animation-name: constellation-turn; border: 1px solid color-mix(in srgb, var(--accent) 64%, transparent); border-radius: 999px; height: calc(var(--width) * .54); opacity: .2; width: calc(var(--width) * .54); }
+.glyph-orbit::after { background: var(--accent); border-radius: 999px; box-shadow: 0 0 18px var(--accent); content: ""; height: 5px; position: absolute; right: 10%; top: 14%; width: 5px; }
+.glyph-rays { animation-name: clean-ray-sweep; background: linear-gradient(90deg, transparent, var(--accent), transparent); height: 1px; opacity: .34; width: calc(var(--width) * 1.6); }
+.glyph-drift { animation-name: ambient-drift-line; background: linear-gradient(90deg, transparent, rgba(255,255,255,.7), transparent); height: 1px; opacity: .16; width: var(--width); }
+.glyph-flames { animation-name: smoke-lift; background: radial-gradient(circle at 50% 80%, color-mix(in srgb, var(--accent) 48%, transparent), transparent 62%), linear-gradient(180deg, transparent, rgba(255,255,255,.16), transparent); border-radius: 999px; bottom: -8vh; filter: blur(18px); height: calc(var(--width) * 1.1); opacity: .24; top: auto !important; width: calc(var(--width) * .42); }
+.glyph-hearts { animation-name: heart-bubble-rise; background: var(--accent); border-radius: 30% 30% 8% 30%; bottom: -6vh; box-shadow: 0 0 32px color-mix(in srgb, var(--accent) 58%, transparent); height: 34px; opacity: .28; top: auto !important; transform: rotate(45deg); width: 34px; }
+.glyph-hearts::before, .glyph-hearts::after, .particle-hearts::before, .particle-hearts::after { background: inherit; border-radius: 999px; content: ""; position: absolute; }
+.glyph-hearts::before, .glyph-hearts::after { height: 34px; width: 34px; }
+.glyph-hearts::before { left: -17px; top: 0; }
+.glyph-hearts::after { left: 0; top: -17px; }
+.glyph-candy { animation-name: candy-tumble; background: repeating-linear-gradient(135deg, rgba(255,255,255,.88) 0 8px, var(--accent) 8px 16px); border-radius: 999px; box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 42%, transparent); height: 24px; opacity: .52; top: -10vh !important; width: 56px; }
+.glyph-rain { animation-name: rain-sheet; background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--accent) 68%, white), transparent); border-radius: 999px; height: calc(var(--width) * .92); opacity: .34; top: -16vh !important; width: 2px; }
+.glyph-thunder { animation-name: lightning-snap; background: linear-gradient(180deg, #fff, var(--accent), transparent); clip-path: polygon(48% 0,72% 0,58% 34%,80% 34%,36% 100%,46% 50%,28% 50%); filter: drop-shadow(0 0 18px var(--accent)); height: calc(var(--width) * .78); opacity: .2; width: calc(var(--width) * .28); }
+
+.particle-embers { animation-name: ember-rise; border-radius: 45% 55% 40% 60%; }
+.particle-waves { animation-name: wave-drift; height: 2px; opacity: .3; width: calc(var(--size) * 6); }
+.particle-sparkles, .particle-bursts, .particle-rise, .particle-drift { animation-name: sparkle-float; }
+.particle-mist, .particle-blur { animation-name: mist-drift; filter: blur(10px); opacity: .18; }
+.particle-jitter { animation-name: tension-jitter; border-radius: 2px; height: 1px; opacity: .34; width: calc(var(--size) * 7); }
+.particle-bokeh { animation-name: bokeh-shimmer; background: rgba(255,255,255,.42); border: 1px solid var(--accent); }
+.particle-orbit { animation-name: orbit-dots; transform-origin: 36px 36px; }
+.particle-rays { animation-name: ray-glow; border-radius: 999px; height: 1px; opacity: .36; width: calc(var(--size) * 10); }
+.particle-flames { animation-name: flame-lick; background: radial-gradient(circle at 48% 72%, #fff7ad 0 14%, var(--accent) 38%, #dc2626 72%, transparent 74%); border-radius: 58% 42% 52% 48% / 72% 74% 26% 28%; bottom: -12vh; filter: blur(.5px); height: calc(var(--size) * 3.2); opacity: .68; top: auto !important; transform-origin: 50% 100%; width: calc(var(--size) * 1.55); }
+.particle-hearts { animation-name: heart-bubble-rise; background: var(--accent); border-radius: 32% 32% 8% 32%; bottom: -8vh; box-shadow: 0 0 26px color-mix(in srgb, var(--accent) 65%, transparent); height: calc(var(--size) * 1.2); opacity: .48; top: auto !important; transform: rotate(45deg); width: calc(var(--size) * 1.2); }
+.particle-hearts::before, .particle-hearts::after { height: 100%; width: 100%; }
+.particle-hearts::before { left: -50%; top: 0; }
+.particle-hearts::after { left: 0; top: -50%; }
+.particle-candy { animation-name: candy-fall; animation-timing-function: linear; background: repeating-linear-gradient(135deg, rgba(255,255,255,.95) 0 5px, var(--accent) 5px 10px); border-radius: 999px; box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 42%, transparent); height: calc(var(--size) * .72); opacity: .62; top: -12vh !important; width: calc(var(--size) * 2.4); }
+.particle-rain { animation-name: rain-fall; animation-timing-function: linear; background: linear-gradient(180deg, transparent, rgba(255,255,255,.82), var(--accent)); border-radius: 999px; box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 36%, transparent); height: calc(var(--size) * 6.5); opacity: .46; top: -18vh !important; width: 2px; }
+.particle-thunder { animation-name: thunder-bolt; background: linear-gradient(180deg, #fff, var(--accent), #f97316); border-radius: 0; clip-path: polygon(46% 0,70% 0,57% 35%,82% 35%,34% 100%,44% 52%,22% 52%); filter: drop-shadow(0 0 14px var(--accent)); height: calc(var(--size) * 4.6); opacity: .28; width: calc(var(--size) * 2.1); }
+.effect-thunder::before { animation: storm-flash 5.8s ease-in-out infinite; background: radial-gradient(circle at 54% 18%, rgba(255,255,255,.58), transparent 32%); content: ""; inset: 0; opacity: 0; position: absolute; }
+.effect-flames::before { animation: heat-haze 4.6s ease-in-out infinite; background: repeating-linear-gradient(90deg, transparent 0 18px, color-mix(in srgb, var(--glass-strong) 36%, transparent) 18px 20px, transparent 20px 42px); content: ""; filter: blur(12px); inset: auto -8% -10% -8%; height: 44vh; opacity: .16; position: absolute; }
+
+@keyframes gradient-breathe { from { transform: scale(1) translate3d(0,0,0); } to { transform: scale(1.08) translate3d(2%,-2%,0); } }
+@keyframes float-orb { from { transform: translate3d(0,0,0) scale(1); } to { transform: translate3d(12vw,8vh,0) scale(1.12); } }
+@keyframes ember-rise { 0% { opacity: 0; transform: translate3d(0,24px,0) scale(.7); } 45% { opacity: .72; } 100% { opacity: 0; transform: translate3d(22px,-150px,0) scale(1.3); } }
+@keyframes wave-drift { 0%,100% { transform: translateX(-18px) scaleX(.7); } 50% { transform: translateX(18px) scaleX(1.25); } }
+@keyframes sparkle-float { 0%,100% { opacity: .18; transform: translate3d(0,22px,0) scale(.7); } 50% { opacity: .72; transform: translate3d(18px,-28px,0) scale(1.1); } }
+@keyframes mist-drift { 0%,100% { transform: translate3d(-16px,12px,0) scale(1); } 50% { transform: translate3d(28px,-18px,0) scale(1.4); } }
+@keyframes tension-jitter, anxious-line-shake { 0%,100% { transform: rotate(var(--rotation, 0deg)) translate3d(0,0,0); } 25% { transform: rotate(var(--rotation, 0deg)) translate3d(8px,-3px,0); } 50% { transform: rotate(var(--rotation, 0deg)) translate3d(-7px,4px,0); } 75% { transform: rotate(var(--rotation, 0deg)) translate3d(5px,2px,0); } }
+@keyframes bokeh-shimmer, bokeh-breathe { 0%,100% { opacity: .14; transform: rotate(var(--rotation, 0deg)) translate3d(0,16px,0) scale(1); } 50% { opacity: .44; transform: rotate(var(--rotation, 0deg)) translate3d(18px,-24px,0) scale(1.7); } }
+@keyframes orbit-dots { from { transform: rotate(0deg) translateX(22px) rotate(0deg); } to { transform: rotate(360deg) translateX(22px) rotate(-360deg); } }
+@keyframes ray-glow, clean-ray-sweep { 0%,100% { opacity: .14; transform: rotate(var(--rotation, -18deg)) translateX(-16px); } 50% { opacity: .5; transform: rotate(var(--rotation, -18deg)) translateX(26px); } }
+@keyframes wave-ribbon-flow { 0%,100% { transform: rotate(var(--rotation)) translate3d(-18px,10px,0) scaleX(.78); } 50% { transform: rotate(var(--rotation)) translate3d(18px,-10px,0) scaleX(1.18); } }
+@keyframes heat-flare { 0% { opacity: 0; transform: rotate(var(--rotation)) translate3d(0,38px,0) scaleY(.6); } 44% { opacity: .38; } 100% { opacity: 0; transform: rotate(var(--rotation)) translate3d(20px,-90px,0) scaleY(1.4); } }
+@keyframes burst-pop { 0%,100% { opacity: .12; transform: rotate(var(--rotation)) scale(.7); } 45% { opacity: .56; transform: rotate(calc(var(--rotation) + 35deg)) scale(1.18); } }
+@keyframes fog-bank { 0%,100% { transform: rotate(var(--rotation)) translate3d(-28px,12px,0) scale(.92); } 50% { transform: rotate(var(--rotation)) translate3d(28px,-12px,0) scale(1.22); } }
+@keyframes upward-thread { 0% { opacity: 0; transform: rotate(var(--rotation)) translate3d(0,44px,0) scaleY(.5); } 50% { opacity: .42; } 100% { opacity: 0; transform: rotate(var(--rotation)) translate3d(0,-88px,0) scaleY(1.28); } }
+@keyframes constellation-turn { from { transform: rotate(var(--rotation)) translate3d(0,0,0) rotate(0deg); } to { transform: rotate(var(--rotation)) translate3d(8px,-8px,0) rotate(360deg); } }
+@keyframes ambient-drift-line { 0%,100% { transform: rotate(var(--rotation)) translate3d(-20px,0,0); } 50% { transform: rotate(var(--rotation)) translate3d(20px,-10px,0); } }
+@keyframes flame-lick { 0% { opacity: 0; transform: translate3d(-8px,40px,0) scaleY(.72) scaleX(.82) rotate(-8deg); } 24% { opacity: .82; } 62% { opacity: .54; transform: translate3d(8px,-44vh,0) scaleY(1.18) scaleX(.92) rotate(7deg); } 100% { opacity: 0; transform: translate3d(-4px,-76vh,0) scaleY(.6) scaleX(1.18) rotate(-4deg); } }
+@keyframes smoke-lift { 0% { opacity: 0; transform: rotate(var(--rotation)) translate3d(0,30px,0) scale(.72); } 35% { opacity: .26; } 100% { opacity: 0; transform: rotate(calc(var(--rotation) + 10deg)) translate3d(22px,-58vh,0) scale(1.75); } }
+@keyframes heat-haze { 0%,100% { transform: translate3d(-2%,0,0) skewX(-4deg); } 50% { transform: translate3d(2%,-2%,0) skewX(5deg); } }
+@keyframes heart-bubble-rise { 0% { opacity: 0; transform: rotate(45deg) translate3d(0,24px,0) scale(.58); } 28% { opacity: .52; } 100% { opacity: 0; transform: rotate(45deg) translate3d(26px,-72vh,0) scale(1.42); } }
+@keyframes candy-fall, candy-tumble { 0% { opacity: 0; transform: rotate(var(--rotation, 0deg)) translate3d(-14px,-12vh,0) rotate(0deg); } 12% { opacity: .62; } 100% { opacity: 0; transform: rotate(var(--rotation, 0deg)) translate3d(28px,118vh,0) rotate(520deg); } }
+@keyframes rain-fall, rain-sheet { 0% { opacity: 0; transform: rotate(calc(var(--rotation, 0deg) + 8deg)) translate3d(-10px,-18vh,0); } 16% { opacity: .52; } 100% { opacity: 0; transform: rotate(calc(var(--rotation, 0deg) + 8deg)) translate3d(24px,112vh,0); } }
+@keyframes thunder-bolt, lightning-snap { 0%,74%,100% { opacity: 0; transform: rotate(var(--rotation, 0deg)) translate3d(0,-14px,0) scaleY(.74); } 76% { opacity: .9; transform: rotate(var(--rotation, 0deg)) translate3d(-8px,0,0) scaleY(1.06); } 81% { opacity: .72; transform: rotate(var(--rotation, 0deg)) translate3d(7px,10px,0) scaleY(.95); } 86% { opacity: 0; transform: rotate(var(--rotation, 0deg)) translate3d(0,18px,0) scaleY(.72); } }
+@keyframes storm-flash { 0%,70%,100% { opacity: 0; } 72% { opacity: .34; } 73% { opacity: 0; } 76% { opacity: .2; } 79% { opacity: 0; } }
+
+@media (max-width: 620px) {
+  .app { align-items: flex-start; padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left)); }
+  .content-shell { justify-content: center; min-height: 100svh; padding-block: 44px 28px; }
+  h1 { font-size: clamp(1.65rem, 8vw, 2.8rem); margin-bottom: 24px; }
+  .mood-input { border-radius: 28px; gap: 6px; }
+  .mood-input input { padding-left: 14px; }
+  .mood-input button { padding-inline: 14px; }
+  .emotion-chip { font-size: .82rem; padding: 8px 11px; }
+  .particle:nth-child(n + 17), .mood-glyph:nth-child(n + 9) { display: none; }
+}
+
+@media (max-height: 720px) {
+  .content-shell { padding-block: 24px; }
+  .eyebrow { margin-bottom: 10px; }
+  h1 { font-size: clamp(1.55rem, 6.4vw, 3.5rem); margin-bottom: 20px; }
+  .response-message { margin-block: 14px 16px; }
+  .emotion-chips { margin-bottom: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .001ms !important; }
+  .particle-layer { display: none; }
+}
