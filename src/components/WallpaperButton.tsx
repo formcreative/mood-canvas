@@ -63,12 +63,12 @@ export function WallpaperButton({ emotion }: WallpaperButtonProps) {
 
   return (
     <button
-      aria-label="Save current mood as a wallpaper image"
+      aria-label="Save current mood as your phone wallpaper image"
       className="wallpaper-button"
       onClick={saveWallpaper}
       type="button"
     >
-      Save as Wallpaper
+      Save as your phone wallpaper
     </button>
   );
 }
