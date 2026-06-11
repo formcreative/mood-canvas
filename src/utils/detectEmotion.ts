@@ -1,4 +1,5 @@
 import { emotions, neutralEmotion, type Emotion } from "../data/emotions";
+import { vocabularyBoosts } from "../data/vocabularyBoosts";
 
 const generatedEffects = ["waves", "sparkles", "hearts", "candy", "rise", "orbit", "drift"] as const;
 
@@ -95,6 +96,14 @@ export function detectEmotion(input: string): Emotion {
 
   if (!normalized) {
     return neutralEmotion;
+  }
+
+  for (const boost of vocabularyBoosts) {
+    const hasBoostedPhrase = boost.phrases.some((phrase) => keywordPattern(phrase).test(normalized));
+
+    if (hasBoostedPhrase) {
+      return emotions.find((emotion) => emotion.id === boost.emotionId) ?? neutralEmotion;
+    }
   }
 
   let bestMatch: { emotion: Emotion; score: number } | undefined;
