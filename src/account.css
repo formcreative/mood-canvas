@@ -8,6 +8,60 @@
   display: none;
 }
 
+.profile-bubble {
+  align-items: center;
+  backdrop-filter: blur(26px) saturate(1.35);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 999px;
+  box-shadow:
+    0 20px 70px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  color: currentColor;
+  cursor: pointer;
+  display: inline-flex;
+  height: 48px;
+  justify-content: center;
+  position: fixed;
+  right: max(18px, env(safe-area-inset-right));
+  top: max(18px, env(safe-area-inset-top));
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+  width: 48px;
+  z-index: 11;
+}
+
+.profile-bubble svg {
+  height: 23px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.9;
+  width: 23px;
+}
+
+.profile-bubble:hover {
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateY(-1px);
+}
+
+.profile-bubble:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.profile-bubble[aria-pressed="true"] {
+  background: rgba(255, 255, 255, 0.9);
+  color: #111827;
+}
+
+.profile-bubble:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.76);
+  outline-offset: 4px;
+}
+
 .account-shell {
   margin-inline: auto;
   max-width: 1180px;
@@ -312,6 +366,27 @@
 }
 
 @media (max-width: 620px) {
+  .app-menu {
+    max-width: calc(100vw - 92px);
+  }
+
+  .app-menu button {
+    font-size: 0.8rem;
+    padding-inline: 9px;
+  }
+
+  .profile-bubble {
+    height: 42px;
+    right: max(12px, env(safe-area-inset-right));
+    top: max(12px, env(safe-area-inset-top));
+    width: 42px;
+  }
+
+  .profile-bubble svg {
+    height: 21px;
+    width: 21px;
+  }
+
   .account-shell {
     padding-top: 72px;
   }
