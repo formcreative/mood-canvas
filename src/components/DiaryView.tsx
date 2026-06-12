@@ -1,7 +1,9 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
+import { getProfileName, type UserProfile } from "../data/profile";
 
 const DIARY_STORAGE_KEY = "mood-canvas-diary-entries";
+const DIARY_UPDATED_EVENT = "mood-canvas-diary-updated";
 const monthFormatter = new Intl.DateTimeFormat(undefined, { month: "long", year: "numeric" });
 const dayFormatter = new Intl.DateTimeFormat(undefined, { weekday: "short", month: "short", day: "numeric" });
 const todayFormatter = new Intl.DateTimeFormat(undefined, {
@@ -40,9 +42,10 @@ function readEntries() {
 
 interface DiaryViewProps {
   accentColor: string;
+  profile: UserProfile | null;
 }
 
-export function DiaryView({ accentColor }: DiaryViewProps) {
+export function DiaryView({ accentColor, profile }: DiaryViewProps) {
   const today = useMemo(() => new Date(), []);
   const todayKey = useMemo(() => getDateKey(today), [today]);
   const [visibleMonth, setVisibleMonth] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
@@ -54,6 +57,7 @@ export function DiaryView({ accentColor }: DiaryViewProps) {
 
   useEffect(() => {
     window.localStorage.setItem(DIARY_STORAGE_KEY, JSON.stringify(entries));
+    window.dispatchEvent(new CustomEvent(DIARY_UPDATED_EVENT));
   }, [entries]);
 
   const calendarDays = useMemo(() => {
@@ -100,7 +104,7 @@ export function DiaryView({ accentColor }: DiaryViewProps) {
       transition={{ duration: shouldReduceMotion ? 0 : 0.5, ease: "easeOut" }}
     >
       <div className="diary-heading">
-        <p className="diary-kicker">Private daily diary</p>
+        <p className="diary-kicker">{profile ? `${getProfileName(profile)}'s private diary` : "Private daily diary"}</p>
         <h1>{todayFormatter.format(today)}</h1>
       </div>
 
@@ -171,7 +175,9 @@ export function DiaryView({ accentColor }: DiaryViewProps) {
           />
 
           <p className="diary-save-note">
-            Entries save privately in this browser. Pick any day on the calendar to read or continue it.
+            {profile
+              ? `Entries are saved with ${profile.email} in this browser. Pick any day to read or continue it.`
+              : "Entries save privately in this browser. Create an Account profile to keep your diary, birthday, and horoscope together."}
           </p>
         </section>
       </div>
