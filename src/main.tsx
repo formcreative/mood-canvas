@@ -4,6 +4,7 @@ import App from "./App";
 import "./index.css";
 import "./effect-fixes.css";
 import "./interaction-polish.css";
+import "./diary.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
