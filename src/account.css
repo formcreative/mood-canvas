@@ -1,0 +1,251 @@
+.app-menu {
+  max-width: calc(100vw - 24px);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.app-menu::-webkit-scrollbar {
+  display: none;
+}
+
+.account-shell {
+  margin-inline: auto;
+  max-width: 1180px;
+  padding: 82px 0 28px;
+  position: relative;
+  width: min(100%, 1180px);
+  z-index: 2;
+}
+
+.account-heading {
+  margin: 0 auto 26px;
+  max-width: 780px;
+  text-align: center;
+}
+
+.account-kicker {
+  font-size: 0.74rem;
+  font-weight: 850;
+  letter-spacing: 0.18em;
+  margin: 0 0 12px;
+  opacity: 0.72;
+  text-transform: uppercase;
+}
+
+.account-heading h1 {
+  font-size: clamp(2rem, 6vw, 4rem);
+  margin-bottom: 14px;
+}
+
+.account-heading > p:last-child {
+  font-size: clamp(0.98rem, 2vw, 1.14rem);
+  line-height: 1.65;
+  margin: 0 auto;
+  max-width: 680px;
+  opacity: 0.72;
+}
+
+.account-workspace {
+  align-items: stretch;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(360px, 1fr) minmax(320px, 0.8fr);
+}
+
+.account-form-panel,
+.account-summary-panel {
+  backdrop-filter: blur(32px) saturate(1.28);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.09));
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 28px;
+  box-shadow:
+    0 30px 90px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  padding: 20px;
+}
+
+.account-badge {
+  background: rgba(255, 255, 255, 0.84);
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  padding: 8px 12px;
+  text-transform: uppercase;
+}
+
+.account-form-panel h2 {
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  line-height: 1;
+  margin: 28px 0 22px;
+}
+
+.account-form-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.account-form-grid label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.76rem;
+  font-weight: 850;
+  gap: 8px;
+  letter-spacing: 0.12em;
+  opacity: 0.86;
+  text-transform: uppercase;
+}
+
+.account-form-grid input {
+  appearance: none;
+  background: rgba(255, 255, 255, 0.13);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 18px;
+  color: currentColor;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: 0;
+  min-height: 54px;
+  outline: 0;
+  padding: 0 16px;
+  text-transform: none;
+}
+
+.account-form-grid input:focus-visible,
+.account-primary-button:focus-visible,
+.account-secondary-button:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.76);
+  outline-offset: 4px;
+}
+
+.account-form-grid input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.76;
+}
+
+.account-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.account-primary-button,
+.account-secondary-button {
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 850;
+  min-height: 46px;
+  padding: 0 18px;
+}
+
+.account-primary-button {
+  background: rgba(255, 255, 255, 0.9);
+  color: #111827;
+}
+
+.account-secondary-button {
+  background: rgba(255, 255, 255, 0.14);
+  color: currentColor;
+}
+
+.account-status {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  margin: 14px 0 0;
+  opacity: 0.72;
+}
+
+.account-summary-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.account-summary-card,
+.account-summary-grid article {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 24px;
+  padding: 18px;
+}
+
+.account-summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.account-summary-card small,
+.account-summary-grid small {
+  font-size: 0.7rem;
+  font-weight: 850;
+  letter-spacing: 0.16em;
+  opacity: 0.58;
+  text-transform: uppercase;
+}
+
+.account-summary-card strong {
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1;
+}
+
+.account-summary-card span,
+.account-summary-grid span,
+.account-summary-panel > p {
+  line-height: 1.55;
+  opacity: 0.7;
+}
+
+.account-summary-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.account-summary-grid article {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 150px;
+}
+
+.account-summary-grid strong {
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 0.95;
+}
+
+.account-summary-panel > p {
+  font-size: 0.94rem;
+  margin: auto 0 0;
+}
+
+@media (max-width: 900px) {
+  .account-workspace {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .account-shell {
+    padding-top: 72px;
+  }
+
+  .account-form-panel,
+  .account-summary-panel {
+    border-radius: 22px;
+    padding: 16px;
+  }
+
+  .account-form-grid,
+  .account-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
