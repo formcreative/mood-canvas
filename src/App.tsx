@@ -88,10 +88,20 @@ function App() {
         <button aria-pressed={activeView === "horoscope"} onClick={() => setActiveView("horoscope")} type="button">
           Horoscope
         </button>
-        <button aria-pressed={activeView === "account"} onClick={() => setActiveView("account")} type="button">
-          Account
-        </button>
       </nav>
+      <button
+        aria-label={profile ? "Open your profile" : "Create your profile"}
+        aria-pressed={activeView === "account"}
+        className="profile-bubble"
+        onClick={() => setActiveView("account")}
+        title={profile ? "Open your profile" : "Create your profile"}
+        type="button"
+      >
+        <svg aria-hidden="true" fill="none" viewBox="0 0 24 24">
+          <path d="M12 12.25c2.14 0 3.88-1.74 3.88-3.88S14.14 4.5 12 4.5 8.12 6.23 8.12 8.37 9.86 12.25 12 12.25Z" />
+          <path d="M5.85 19.5c.78-3 3.07-4.63 6.15-4.63s5.37 1.63 6.15 4.63" />
+        </svg>
+      </button>
 
       <AnimatePresence mode="wait">
         {activeView === "mood" ? (
