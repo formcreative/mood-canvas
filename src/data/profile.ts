@@ -2,10 +2,12 @@ export const PROFILE_STORAGE_KEY = "mood-canvas-profile";
 export const PROFILE_UPDATED_EVENT = "mood-canvas-profile-updated";
 
 export interface UserProfile {
+  consentVersion?: string;
   firstName: string;
   lastName: string;
   email: string;
   dateOfBirth: string;
+  privacyConsentAt?: string;
   updatedAt: string;
 }
 
@@ -31,10 +33,12 @@ export function readProfile(): UserProfile | null {
 export function saveProfile(profile: Omit<UserProfile, "updatedAt">) {
   const nextProfile: UserProfile = {
     ...profile,
+    consentVersion: profile.consentVersion ?? "privacy-consent-v1",
     dateOfBirth: profile.dateOfBirth.trim(),
     email: profile.email.trim().toLowerCase(),
     firstName: profile.firstName.trim(),
     lastName: profile.lastName.trim(),
+    privacyConsentAt: profile.privacyConsentAt ?? new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
 
