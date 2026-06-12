@@ -2,13 +2,14 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMemo, useState } from "react";
 import { DiaryView } from "./components/DiaryView";
 import { EmotionChips } from "./components/EmotionChips";
+import { HoroscopeView } from "./components/HoroscopeView";
 import { MoodBackground } from "./components/MoodBackground";
 import { MoodInput } from "./components/MoodInput";
 import { WallpaperButton } from "./components/WallpaperButton";
 import { emotions, neutralEmotion, type Emotion } from "./data/emotions";
 import { detectEmotion } from "./utils/detectEmotion";
 
-type AppView = "mood" | "diary";
+type AppView = "mood" | "diary" | "horoscope";
 
 function App() {
   const [activeView, setActiveView] = useState<AppView>("mood");
@@ -41,6 +42,9 @@ function App() {
         </button>
         <button aria-pressed={activeView === "diary"} onClick={() => setActiveView("diary")} type="button">
           Diary
+        </button>
+        <button aria-pressed={activeView === "horoscope"} onClick={() => setActiveView("horoscope")} type="button">
+          Horoscope
         </button>
       </nav>
 
@@ -91,8 +95,10 @@ function App() {
               <p>Save this mood as a wallpaper and let your phone reflect how you feel.</p>
             </div>
           </motion.section>
-        ) : (
+        ) : activeView === "diary" ? (
           <DiaryView accentColor={selectedEmotion.accentColor} key="diary" />
+        ) : (
+          <HoroscopeView accentColor={selectedEmotion.accentColor} key="horoscope" />
         )}
       </AnimatePresence>
     </main>
