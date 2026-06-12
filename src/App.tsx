@@ -1,5 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useMemo, useState } from "react";
+import { DiaryView } from "./components/DiaryView";
 import { EmotionChips } from "./components/EmotionChips";
 import { MoodBackground } from "./components/MoodBackground";
 import { MoodInput } from "./components/MoodInput";
@@ -7,7 +8,10 @@ import { WallpaperButton } from "./components/WallpaperButton";
 import { emotions, neutralEmotion, type Emotion } from "./data/emotions";
 import { detectEmotion } from "./utils/detectEmotion";
 
+type AppView = "mood" | "diary";
+
 function App() {
+  const [activeView, setActiveView] = useState<AppView>("mood");
   const [selectedEmotion, setSelectedEmotion] = useState<Emotion>(neutralEmotion);
   const [lastSubmitted, setLastSubmitted] = useState("okay");
   const shouldReduceMotion = useReducedMotion();
@@ -29,48 +33,68 @@ function App() {
   }
 
   return (
-    <main className="app" style={{ color: selectedEmotion.textColor }}>
+    <main className={`app app-${activeView}`} style={{ color: selectedEmotion.textColor }}>
       <MoodBackground emotion={selectedEmotion} />
-      <section className="content-shell">
-        <motion.p
-          className="eyebrow"
-          initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
-          animate={{ opacity: 0.82, y: 0 }}
-          transition={{ duration: shouldReduceMotion ? 0 : 0.7 }}
-        >
-          Mood Palette
-        </motion.p>
-        <motion.h1
-          initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: shouldReduceMotion ? 0 : 0.8,
-            delay: shouldReduceMotion ? 0 : 0.08,
-            ease: [0.16, 1, 0.3, 1],
-          }}
-        >
-          How are you feeling today?
-        </motion.h1>
-        <MoodInput accentColor={selectedEmotion.accentColor} onSubmit={handleMoodSubmit} />
-        <AnimatePresence mode="wait">
-          <motion.p
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            className="response-message"
-            exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -8, filter: "blur(5px)" }}
-            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8, filter: "blur(5px)" }}
-            key={responseKey}
-            role="status"
-            transition={{ duration: shouldReduceMotion ? 0 : 0.42, ease: "easeOut" }}
+      <nav aria-label="Main menu" className="app-menu">
+        <button aria-pressed={activeView === "mood"} onClick={() => setActiveView("mood")} type="button">
+          Mood
+        </button>
+        <button aria-pressed={activeView === "diary"} onClick={() => setActiveView("diary")} type="button">
+          Diary
+        </button>
+      </nav>
+
+      <AnimatePresence mode="wait">
+        {activeView === "mood" ? (
+          <motion.section
+            className="content-shell"
+            exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -14 }}
+            key="mood"
+            transition={{ duration: shouldReduceMotion ? 0 : 0.32, ease: "easeOut" }}
           >
-            {selectedEmotion.responseMessage}
-          </motion.p>
-        </AnimatePresence>
-        <EmotionChips emotions={emotions} onSelect={handleChipSelect} selectedId={selectedEmotion.id} />
-        <div className="wallpaper-panel">
-          <WallpaperButton emotion={selectedEmotion} />
-          <p>Save this mood as a wallpaper and let your phone reflect how you feel.</p>
-        </div>
-      </section>
+            <motion.p
+              className="eyebrow"
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
+              animate={{ opacity: 0.82, y: 0 }}
+              transition={{ duration: shouldReduceMotion ? 0 : 0.7 }}
+            >
+              Mood Palette
+            </motion.p>
+            <motion.h1
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: shouldReduceMotion ? 0 : 0.8,
+                delay: shouldReduceMotion ? 0 : 0.08,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+            >
+              How are you feeling today?
+            </motion.h1>
+            <MoodInput accentColor={selectedEmotion.accentColor} onSubmit={handleMoodSubmit} />
+            <AnimatePresence mode="wait">
+              <motion.p
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                className="response-message"
+                exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -8, filter: "blur(5px)" }}
+                initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8, filter: "blur(5px)" }}
+                key={responseKey}
+                role="status"
+                transition={{ duration: shouldReduceMotion ? 0 : 0.42, ease: "easeOut" }}
+              >
+                {selectedEmotion.responseMessage}
+              </motion.p>
+            </AnimatePresence>
+            <EmotionChips emotions={emotions} onSelect={handleChipSelect} selectedId={selectedEmotion.id} />
+            <div className="wallpaper-panel">
+              <WallpaperButton emotion={selectedEmotion} />
+              <p>Save this mood as a wallpaper and let your phone reflect how you feel.</p>
+            </div>
+          </motion.section>
+        ) : (
+          <DiaryView accentColor={selectedEmotion.accentColor} key="diary" />
+        )}
+      </AnimatePresence>
     </main>
   );
 }
