@@ -15,6 +15,7 @@ function getInitialForm(profile: UserProfile | null) {
     email: profile?.email ?? "",
     firstName: profile?.firstName ?? "",
     lastName: profile?.lastName ?? "",
+    privacyAccepted: Boolean(profile?.privacyConsentAt),
   };
 }
 
@@ -54,8 +55,12 @@ export function AccountView({ accentColor, diaryCount, onProfileChange, profile 
   const displayName = getProfileName(profile);
   const zodiacName = useMemo(() => getZodiacName(form.dateOfBirth), [form.dateOfBirth]);
 
-  function updateField(field: keyof typeof form, value: string) {
+  function updateField(field: Exclude<keyof typeof form, "privacyAccepted">, value: string) {
     setForm((currentForm) => ({ ...currentForm, [field]: value }));
+  }
+
+  function updatePrivacyAccepted(value: boolean) {
+    setForm((currentForm) => ({ ...currentForm, privacyAccepted: value }));
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -66,7 +71,19 @@ export function AccountView({ accentColor, diaryCount, onProfileChange, profile 
       return;
     }
 
-    const nextProfile = saveProfile(form);
+    if (!form.privacyAccepted) {
+      setStatus("Please agree to the Privacy & Consent notice before saving your profile.");
+      return;
+    }
+
+    const nextProfile = saveProfile({
+      consentVersion: "privacy-consent-v1",
+      dateOfBirth: form.dateOfBirth,
+      email: form.email,
+      firstName: form.firstName,
+      lastName: form.lastName,
+      privacyConsentAt: profile?.privacyConsentAt,
+    });
     onProfileChange(nextProfile);
     setStatus("Saved. Your diary and horoscope now use this profile.");
   }
@@ -150,6 +167,35 @@ export function AccountView({ accentColor, diaryCount, onProfileChange, profile 
               </span>
             </label>
           </div>
+
+          <section className="privacy-consent-panel" aria-labelledby="privacy-consent-title">
+            <div>
+              <p className="privacy-consent-eyebrow">Required agreement</p>
+              <h3 id="privacy-consent-title">Privacy & Consent</h3>
+              <p>
+                By creating a profile, you agree that Mood Canvas may save and use the details you enter here, your mood
+                prompts, diary entries, horoscope birthday information, payment status when enabled, and app activity
+                needed to provide and improve the experience.
+              </p>
+              <p>
+                Mood Canvas is for reflection and entertainment. It is not medical, mental health, legal, financial, or
+                emergency advice. You use the app at your own discretion, and you can remove this local profile from this
+                browser by signing out.
+              </p>
+            </div>
+
+            <label className="privacy-consent-check">
+              <input
+                checked={form.privacyAccepted}
+                onChange={(event) => updatePrivacyAccepted(event.target.checked)}
+                required
+                type="checkbox"
+              />
+              <span>
+                I agree to the Privacy & Consent notice and understand the app may use the information I choose to enter.
+              </span>
+            </label>
+          </section>
 
           <div className="account-actions">
             <button className="account-primary-button" type="submit">
