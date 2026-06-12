@@ -1,7 +1,6 @@
 import { motion, useReducedMotion } from "framer-motion";
-import { useEffect, useMemo, useRef, useState } from "react";
-
-const BIRTHDAY_STORAGE_KEY = "mood-canvas-horoscope-birthday";
+import { useMemo } from "react";
+import { getProfileName, type UserProfile } from "../data/profile";
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, {
   day: "numeric",
@@ -70,14 +69,8 @@ const readingThemes = [
 
 interface HoroscopeViewProps {
   accentColor: string;
-}
-
-function readBirthday() {
-  try {
-    return window.localStorage.getItem(BIRTHDAY_STORAGE_KEY) ?? "";
-  } catch {
-    return "";
-  }
+  onOpenAccount: () => void;
+  profile: UserProfile | null;
 }
 
 function getDateKey(date: Date) {
@@ -118,25 +111,12 @@ function getDailyReading(birthday: string, date: Date) {
   return { sign, theme };
 }
 
-export function HoroscopeView({ accentColor }: HoroscopeViewProps) {
+export function HoroscopeView({ accentColor, onOpenAccount, profile }: HoroscopeViewProps) {
   const today = useMemo(() => new Date(), []);
-  const [birthday, setBirthday] = useState(() => readBirthday());
-  const birthdayInputRef = useRef<HTMLInputElement>(null);
+  const birthday = profile?.dateOfBirth ?? "";
   const shouldReduceMotion = useReducedMotion();
   const reading = useMemo(() => getDailyReading(birthday, today), [birthday, today]);
   const birthdayDate = birthday ? new Date(`${birthday}T12:00:00`) : null;
-
-  useEffect(() => {
-    try {
-      if (birthday) {
-        window.localStorage.setItem(BIRTHDAY_STORAGE_KEY, birthday);
-      } else {
-        window.localStorage.removeItem(BIRTHDAY_STORAGE_KEY);
-      }
-    } catch {
-      // Local storage can be unavailable in private browsing modes.
-    }
-  }, [birthday]);
 
   return (
     <motion.section
@@ -151,8 +131,8 @@ export function HoroscopeView({ accentColor }: HoroscopeViewProps) {
         <p className="horoscope-kicker">Premium daily reading</p>
         <h1>Your horoscope for {dateFormatter.format(today)}</h1>
         <p>
-          A personalized daily ritual based on your birthday. Account login and paid access are paused for now while
-          we shape the experience.
+          A personalized daily ritual based on your saved profile. Account login and paid access are paused for now
+          while we shape the experience.
         </p>
       </div>
 
@@ -160,26 +140,16 @@ export function HoroscopeView({ accentColor }: HoroscopeViewProps) {
         <section className="horoscope-profile-panel">
           <span className="premium-badge">Paid preview</span>
           <h2>Birth profile</h2>
-          <label htmlFor="birthday">Birthday</label>
-          <input
-            aria-describedby="birthday-note"
-            id="birthday"
-            ref={birthdayInputRef}
-            onChange={(event) => setBirthday(event.target.value)}
-            onInput={(event) => setBirthday(event.currentTarget.value)}
-            type="date"
-            value={birthday}
-          />
-          <button
-            className="birthday-save-button"
-            onClick={() => setBirthday(birthdayInputRef.current?.value ?? birthday)}
-            type="button"
-          >
-            Save birthday
+          <div className="horoscope-profile-summary">
+            <small>Saved account</small>
+            <strong>{profile ? getProfileName(profile) : "No profile yet"}</strong>
+            <span>{profile?.email ?? "Add your account details to personalize this."}</span>
+          </div>
+          <button className="birthday-save-button" onClick={onOpenAccount} type="button">
+            {profile ? "Edit profile" : "Create account profile"}
           </button>
           <p id="birthday-note">
-            This preview saves your birthday in this browser only. Later, paid members can log in and sync this across
-            devices.
+            Your date of birth now lives in Account so horoscope readings and payment details use the same profile.
           </p>
 
           {reading ? (
@@ -225,11 +195,14 @@ export function HoroscopeView({ accentColor }: HoroscopeViewProps) {
           ) : (
             <div className="horoscope-empty-state">
               <span style={{ background: accentColor }} />
-              <h2>Enter a birthday to unlock the preview reading.</h2>
+              <h2>Create your profile to unlock the preview reading.</h2>
               <p>
-                This will become a paid member space for daily guidance, mood history, and a more personal account
-                experience.
+                Add your first name, last name, email, and date of birth in Account. This will become the paid member
+                space for daily guidance, mood history, and a more personal experience.
               </p>
+              <button className="horoscope-empty-button" onClick={onOpenAccount} type="button">
+                Go to Account
+              </button>
             </div>
           )}
         </section>
