@@ -38,6 +38,15 @@ function getZodiacName(dateOfBirth: string) {
   return "Aquarius";
 }
 
+function isValidBirthDate(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(`${value}T12:00:00`);
+
+  return date.getFullYear() === year && date.getMonth() + 1 === month && date.getDate() === day;
+}
+
 export function AccountView({ accentColor, diaryCount, onProfileChange, profile }: AccountViewProps) {
   const [form, setForm] = useState(() => getInitialForm(profile));
   const [status, setStatus] = useState(profile ? "Profile ready" : "Create your local profile");
@@ -51,6 +60,11 @@ export function AccountView({ accentColor, diaryCount, onProfileChange, profile 
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (!isValidBirthDate(form.dateOfBirth)) {
+      setStatus("Use birthday format YYYY-MM-DD so your horoscope can be personalized.");
+      return;
+    }
 
     const nextProfile = saveProfile(form);
     onProfileChange(nextProfile);
@@ -121,12 +135,19 @@ export function AccountView({ accentColor, diaryCount, onProfileChange, profile 
             <label>
               Date of birth
               <input
+                aria-describedby="birthdate-format"
                 autoComplete="bday"
+                inputMode="numeric"
                 onChange={(event) => updateField("dateOfBirth", event.target.value)}
+                pattern="\d{4}-\d{2}-\d{2}"
+                placeholder="YYYY-MM-DD"
                 required
-                type="date"
+                type="text"
                 value={form.dateOfBirth}
               />
+              <span className="account-field-hint" id="birthdate-format">
+                Example: 1990-07-24
+              </span>
             </label>
           </div>
 
