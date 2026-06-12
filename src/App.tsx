@@ -1,5 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { AccountView } from "./components/AccountView";
 import { DiaryView } from "./components/DiaryView";
 import { EmotionChips } from "./components/EmotionChips";
 import { HoroscopeView } from "./components/HoroscopeView";
@@ -7,12 +8,31 @@ import { MoodBackground } from "./components/MoodBackground";
 import { MoodInput } from "./components/MoodInput";
 import { WallpaperButton } from "./components/WallpaperButton";
 import { emotions, neutralEmotion, type Emotion } from "./data/emotions";
+import { PROFILE_UPDATED_EVENT, readProfile, type UserProfile } from "./data/profile";
 import { detectEmotion } from "./utils/detectEmotion";
 
-type AppView = "mood" | "diary" | "horoscope";
+const DIARY_STORAGE_KEY = "mood-canvas-diary-entries";
+
+type AppView = "mood" | "diary" | "horoscope" | "account";
+
+function getDiaryCount() {
+  try {
+    const storedEntries = window.localStorage.getItem(DIARY_STORAGE_KEY);
+    if (!storedEntries) return 0;
+
+    const entries = JSON.parse(storedEntries);
+    if (!entries || typeof entries !== "object") return 0;
+
+    return Object.values(entries).filter((entry) => typeof entry === "string" && entry.trim()).length;
+  } catch {
+    return 0;
+  }
+}
 
 function App() {
   const [activeView, setActiveView] = useState<AppView>("mood");
+  const [diaryCount, setDiaryCount] = useState(() => getDiaryCount());
+  const [profile, setProfile] = useState<UserProfile | null>(() => readProfile());
   const [selectedEmotion, setSelectedEmotion] = useState<Emotion>(neutralEmotion);
   const [lastSubmitted, setLastSubmitted] = useState("okay");
   const shouldReduceMotion = useReducedMotion();
@@ -21,6 +41,28 @@ function App() {
     () => `${selectedEmotion.id}-${lastSubmitted}`,
     [lastSubmitted, selectedEmotion.id],
   );
+
+  useEffect(() => {
+    function handleProfileUpdate() {
+      setProfile(readProfile());
+    }
+
+    function handleDiaryUpdate() {
+      setDiaryCount(getDiaryCount());
+    }
+
+    window.addEventListener(PROFILE_UPDATED_EVENT, handleProfileUpdate);
+    window.addEventListener("storage", handleProfileUpdate);
+    window.addEventListener("storage", handleDiaryUpdate);
+    window.addEventListener("mood-canvas-diary-updated", handleDiaryUpdate);
+
+    return () => {
+      window.removeEventListener(PROFILE_UPDATED_EVENT, handleProfileUpdate);
+      window.removeEventListener("storage", handleProfileUpdate);
+      window.removeEventListener("storage", handleDiaryUpdate);
+      window.removeEventListener("mood-canvas-diary-updated", handleDiaryUpdate);
+    };
+  }, []);
 
   function handleMoodSubmit(value: string) {
     const nextEmotion = detectEmotion(value);
@@ -45,6 +87,9 @@ function App() {
         </button>
         <button aria-pressed={activeView === "horoscope"} onClick={() => setActiveView("horoscope")} type="button">
           Horoscope
+        </button>
+        <button aria-pressed={activeView === "account"} onClick={() => setActiveView("account")} type="button">
+          Account
         </button>
       </nav>
 
@@ -96,9 +141,22 @@ function App() {
             </div>
           </motion.section>
         ) : activeView === "diary" ? (
-          <DiaryView accentColor={selectedEmotion.accentColor} key="diary" />
+          <DiaryView accentColor={selectedEmotion.accentColor} key="diary" profile={profile} />
+        ) : activeView === "horoscope" ? (
+          <HoroscopeView
+            accentColor={selectedEmotion.accentColor}
+            key="horoscope"
+            onOpenAccount={() => setActiveView("account")}
+            profile={profile}
+          />
         ) : (
-          <HoroscopeView accentColor={selectedEmotion.accentColor} key="horoscope" />
+          <AccountView
+            accentColor={selectedEmotion.accentColor}
+            diaryCount={diaryCount}
+            key="account"
+            onProfileChange={setProfile}
+            profile={profile}
+          />
         )}
       </AnimatePresence>
     </main>
