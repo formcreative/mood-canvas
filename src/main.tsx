@@ -6,6 +6,7 @@ import "./effect-fixes.css";
 import "./interaction-polish.css";
 import "./diary.css";
 import "./horoscope.css";
+import "./account.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
