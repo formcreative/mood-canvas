@@ -31,6 +31,7 @@ export function readProfile(): UserProfile | null {
 export function saveProfile(profile: Omit<UserProfile, "updatedAt">) {
   const nextProfile: UserProfile = {
     ...profile,
+    dateOfBirth: profile.dateOfBirth.trim(),
     email: profile.email.trim().toLowerCase(),
     firstName: profile.firstName.trim(),
     lastName: profile.lastName.trim(),
