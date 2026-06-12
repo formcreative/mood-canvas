@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const BIRTHDAY_STORAGE_KEY = "mood-canvas-horoscope-birthday";
 
@@ -121,6 +121,7 @@ function getDailyReading(birthday: string, date: Date) {
 export function HoroscopeView({ accentColor }: HoroscopeViewProps) {
   const today = useMemo(() => new Date(), []);
   const [birthday, setBirthday] = useState(() => readBirthday());
+  const birthdayInputRef = useRef<HTMLInputElement>(null);
   const shouldReduceMotion = useReducedMotion();
   const reading = useMemo(() => getDailyReading(birthday, today), [birthday, today]);
   const birthdayDate = birthday ? new Date(`${birthday}T12:00:00`) : null;
@@ -163,10 +164,19 @@ export function HoroscopeView({ accentColor }: HoroscopeViewProps) {
           <input
             aria-describedby="birthday-note"
             id="birthday"
+            ref={birthdayInputRef}
             onChange={(event) => setBirthday(event.target.value)}
+            onInput={(event) => setBirthday(event.currentTarget.value)}
             type="date"
             value={birthday}
           />
+          <button
+            className="birthday-save-button"
+            onClick={() => setBirthday(birthdayInputRef.current?.value ?? birthday)}
+            type="button"
+          >
+            Save birthday
+          </button>
           <p id="birthday-note">
             This preview saves your birthday in this browser only. Later, paid members can log in and sync this across
             devices.
