@@ -92,6 +92,17 @@ function getSpeechRecognitionConstructor() {
   return window.SpeechRecognition ?? window.webkitSpeechRecognition ?? null;
 }
 
+function MicrophoneIcon() {
+  return (
+    <svg aria-hidden="true" className="diary-microphone-icon" fill="none" viewBox="0 0 24 24">
+      <path d="M12 14.75c1.93 0 3.5-1.57 3.5-3.5V6.5a3.5 3.5 0 0 0-7 0v4.75c0 1.93 1.57 3.5 3.5 3.5Z" />
+      <path d="M18.25 10.75a6.25 6.25 0 0 1-12.5 0" />
+      <path d="M12 17v3.25" />
+      <path d="M8.75 20.25h6.5" />
+    </svg>
+  );
+}
+
 interface DiaryViewProps {
   accentColor: string;
   profile: UserProfile | null;
@@ -329,29 +340,34 @@ export function DiaryView({ accentColor, profile }: DiaryViewProps) {
             <span>{selectedEntry.trim() ? "Saved" : "Empty"}</span>
           </div>
 
-          <textarea
-            aria-label={`Diary entry for ${dayFormatter.format(selectedDate)}`}
-            onChange={(event) => updateEntry(event.target.value)}
-            placeholder="Write what happened, what you felt, what you want to remember..."
-            value={selectedEntry}
-          />
-
-          <div className="diary-voice-panel">
+          <div className="diary-entry-field">
+            <textarea
+              aria-describedby="diary-voice-status diary-voice-note"
+              aria-label={`Diary entry for ${dayFormatter.format(selectedDate)}`}
+              onChange={(event) => updateEntry(event.target.value)}
+              placeholder="Write what happened, what you felt, what you want to remember..."
+              value={selectedEntry}
+            />
             <button
               aria-label={isListening ? "Stop voice dictation" : "Start voice dictation"}
               aria-pressed={isListening}
               className="diary-voice-button"
               disabled={!speechRecognitionSupported}
               onClick={toggleDictation}
-              style={isListening ? { backgroundColor: accentColor } : undefined}
+              style={isListening ? { backgroundColor: accentColor, boxShadow: `0 0 28px ${accentColor}66` } : undefined}
+              title={isListening ? "Stop dictation" : "Speak your diary entry"}
               type="button"
             >
-              <span aria-hidden="true">{isListening ? "Stop" : "Mic"}</span>
-              {isListening ? "Stop dictation" : "Speak entry"}
+              <MicrophoneIcon />
             </button>
+          </div>
+
+          <div className="diary-voice-panel">
             <div className="diary-voice-copy">
-              <p role="status">{speechStatus}</p>
-              <small>
+              <p id="diary-voice-status" role="status">
+                {speechStatus}
+              </p>
+              <small id="diary-voice-note">
                 Voice dictation starts only when you tap the microphone. Your browser may ask for microphone access.
               </small>
               {interimTranscript ? <em aria-live="polite">Hearing: {interimTranscript}</em> : null}
