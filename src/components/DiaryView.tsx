@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getProfileName, type UserProfile } from "../data/profile";
 
 const DIARY_STORAGE_KEY = "mood-canvas-diary-entries";
@@ -15,6 +15,52 @@ const todayFormatter = new Intl.DateTimeFormat(undefined, {
 const weekdayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 type DiaryEntries = Record<string, string>;
+type SpeechRecognitionError = "aborted" | "audio-capture" | "network" | "not-allowed" | "no-speech" | "service-not-allowed";
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+}
+
+interface SpeechRecognitionResult {
+  readonly isFinal: boolean;
+  readonly [index: number]: SpeechRecognitionAlternative;
+}
+
+interface SpeechRecognitionResultList {
+  readonly length: number;
+  readonly [index: number]: SpeechRecognitionResult;
+}
+
+interface SpeechRecognitionEvent {
+  readonly resultIndex: number;
+  readonly results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionErrorEvent {
+  readonly error: SpeechRecognitionError | string;
+}
+
+interface SpeechRecognitionInstance {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onend: (() => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onstart: (() => void) | null;
+  abort: () => void;
+  start: () => void;
+  stop: () => void;
+}
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionInstance;
+
+declare global {
+  interface Window {
+    SpeechRecognition?: SpeechRecognitionConstructor;
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
+  }
+}
 
 function getDateKey(date: Date) {
   const year = date.getFullYear();
@@ -40,6 +86,12 @@ function readEntries() {
   }
 }
 
+function getSpeechRecognitionConstructor() {
+  if (typeof window === "undefined") return null;
+
+  return window.SpeechRecognition ?? window.webkitSpeechRecognition ?? null;
+}
+
 interface DiaryViewProps {
   accentColor: string;
   profile: UserProfile | null;
@@ -51,14 +103,30 @@ export function DiaryView({ accentColor, profile }: DiaryViewProps) {
   const [visibleMonth, setVisibleMonth] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
   const [selectedDate, setSelectedDate] = useState(() => today);
   const [entries, setEntries] = useState<DiaryEntries>(() => readEntries());
+  const [interimTranscript, setInterimTranscript] = useState("");
+  const [isListening, setIsListening] = useState(false);
+  const [speechStatus, setSpeechStatus] = useState("Tap the microphone and speak your diary entry.");
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+  const selectedKeyRef = useRef("");
   const selectedKey = getDateKey(selectedDate);
   const selectedEntry = entries[selectedKey] ?? "";
+  const speechRecognitionSupported = Boolean(getSpeechRecognitionConstructor());
   const shouldReduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    selectedKeyRef.current = selectedKey;
+  }, [selectedKey]);
 
   useEffect(() => {
     window.localStorage.setItem(DIARY_STORAGE_KEY, JSON.stringify(entries));
     window.dispatchEvent(new CustomEvent(DIARY_UPDATED_EVENT));
   }, [entries]);
+
+  useEffect(() => {
+    return () => {
+      recognitionRef.current?.abort();
+    };
+  }, []);
 
   const calendarDays = useMemo(() => {
     const daysInMonth = getDaysInMonth(visibleMonth);
@@ -94,6 +162,100 @@ export function DiaryView({ accentColor, profile }: DiaryViewProps) {
 
       return nextEntries;
     });
+  }
+
+  function appendTranscript(value: string) {
+    const transcript = value.trim();
+    if (!transcript) return;
+
+    setEntries((currentEntries) => {
+      const dateKey = selectedKeyRef.current;
+      const currentEntry = currentEntries[dateKey] ?? "";
+      const separator = currentEntry && !/\s$/.test(currentEntry) ? " " : "";
+
+      return {
+        ...currentEntries,
+        [dateKey]: `${currentEntry}${separator}${transcript}`,
+      };
+    });
+  }
+
+  function stopDictation() {
+    recognitionRef.current?.stop();
+    setInterimTranscript("");
+    setSpeechStatus("Dictation paused. Tap the microphone to continue.");
+    setIsListening(false);
+  }
+
+  function startDictation() {
+    const SpeechRecognition = getSpeechRecognitionConstructor();
+    if (!SpeechRecognition) {
+      setSpeechStatus("Voice dictation is not supported in this browser yet. You can still type your entry.");
+      return;
+    }
+
+    recognitionRef.current?.abort();
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = navigator.language || "en-US";
+    recognitionRef.current = recognition;
+
+    recognition.onstart = () => {
+      setIsListening(true);
+      setSpeechStatus("Listening... speak naturally. Tap Stop when you are done.");
+    };
+
+    recognition.onresult = (event) => {
+      let finalTranscript = "";
+      let nextInterimTranscript = "";
+
+      for (let index = event.resultIndex; index < event.results.length; index += 1) {
+        const result = event.results[index];
+        const transcript = result[0]?.transcript ?? "";
+
+        if (result.isFinal) {
+          finalTranscript += transcript;
+        } else {
+          nextInterimTranscript += transcript;
+        }
+      }
+
+      appendTranscript(finalTranscript);
+      setInterimTranscript(nextInterimTranscript.trim());
+    };
+
+    recognition.onerror = (event) => {
+      const message =
+        event.error === "not-allowed" || event.error === "service-not-allowed"
+          ? "Microphone access was blocked. Allow microphone access in your browser to use voice diary."
+          : "Dictation stopped. You can tap the microphone and try again.";
+
+      setSpeechStatus(message);
+      setInterimTranscript("");
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+      setInterimTranscript("");
+    };
+
+    try {
+      recognition.start();
+    } catch {
+      setSpeechStatus("Dictation is already starting. Give it a second and try again.");
+    }
+  }
+
+  function toggleDictation() {
+    if (isListening) {
+      stopDictation();
+      return;
+    }
+
+    startDictation();
   }
 
   return (
@@ -173,6 +335,28 @@ export function DiaryView({ accentColor, profile }: DiaryViewProps) {
             placeholder="Write what happened, what you felt, what you want to remember..."
             value={selectedEntry}
           />
+
+          <div className="diary-voice-panel">
+            <button
+              aria-label={isListening ? "Stop voice dictation" : "Start voice dictation"}
+              aria-pressed={isListening}
+              className="diary-voice-button"
+              disabled={!speechRecognitionSupported}
+              onClick={toggleDictation}
+              style={isListening ? { backgroundColor: accentColor } : undefined}
+              type="button"
+            >
+              <span aria-hidden="true">{isListening ? "Stop" : "Mic"}</span>
+              {isListening ? "Stop dictation" : "Speak entry"}
+            </button>
+            <div className="diary-voice-copy">
+              <p role="status">{speechStatus}</p>
+              <small>
+                Voice dictation starts only when you tap the microphone. Your browser may ask for microphone access.
+              </small>
+              {interimTranscript ? <em aria-live="polite">Hearing: {interimTranscript}</em> : null}
+            </div>
+          </div>
 
           <p className="diary-save-note">
             {profile
