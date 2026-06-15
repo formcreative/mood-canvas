@@ -48,6 +48,7 @@ textarea {
 .diary-calendar-header button:focus-visible,
 .diary-today-button:focus-visible,
 .diary-day:focus-visible,
+.diary-voice-button:focus-visible,
 .diary-entry-panel textarea:focus-visible {
   outline: 3px solid rgba(255, 255, 255, 0.76);
   outline-offset: 4px;
@@ -270,6 +271,97 @@ textarea {
   opacity: 0.52;
 }
 
+.diary-voice-panel {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 22px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: auto 1fr;
+  margin-top: 14px;
+  padding: 12px;
+}
+
+.diary-voice-button {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.86);
+  border: 0;
+  border-radius: 999px;
+  color: #111827;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.82rem;
+  font-weight: 850;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 16px 0 10px;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.diary-voice-button span {
+  align-items: center;
+  background: rgba(17, 24, 39, 0.1);
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 0.68rem;
+  height: 30px;
+  justify-content: center;
+  letter-spacing: 0.08em;
+  min-width: 30px;
+  text-transform: uppercase;
+}
+
+.diary-voice-button[aria-pressed="true"] {
+  color: #111827;
+}
+
+.diary-voice-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.diary-voice-button:active:not(:disabled) {
+  transform: translateY(1px) scale(0.99);
+}
+
+.diary-voice-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.46;
+}
+
+.diary-voice-copy {
+  min-width: 0;
+}
+
+.diary-voice-copy p,
+.diary-voice-copy small,
+.diary-voice-copy em {
+  display: block;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.diary-voice-copy p {
+  font-size: 0.9rem;
+  font-weight: 760;
+  opacity: 0.88;
+}
+
+.diary-voice-copy small {
+  font-size: 0.78rem;
+  margin-top: 4px;
+  opacity: 0.58;
+}
+
+.diary-voice-copy em {
+  font-size: 0.84rem;
+  font-style: normal;
+  margin-top: 7px;
+  opacity: 0.76;
+}
+
 .diary-save-note {
   font-size: 0.86rem;
   line-height: 1.55;
@@ -317,5 +409,14 @@ textarea {
 
   .diary-entry-panel textarea {
     min-height: 320px;
+  }
+
+  .diary-voice-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .diary-voice-button {
+    justify-content: center;
+    width: 100%;
   }
 }
