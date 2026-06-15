@@ -178,6 +178,11 @@ export function AccountView({ accentColor, diaryCount, onProfileChange, profile 
                 needed to provide and improve the experience.
               </p>
               <p>
+                If you use voice diary, your browser may ask for microphone access and speech recognition may process
+                what you say to create text. Mood Canvas saves the resulting transcript as part of your diary entry, not
+                a raw audio recording.
+              </p>
+              <p>
                 Mood Canvas is for reflection and entertainment. It is not medical, mental health, legal, financial, or
                 emergency advice. You use the app at your own discretion, and you can remove this local profile from this
                 browser by signing out.
