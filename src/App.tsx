@@ -4,6 +4,7 @@ import { AccountView } from "./components/AccountView";
 import { DiaryView } from "./components/DiaryView";
 import { EmotionChips } from "./components/EmotionChips";
 import { HoroscopeView } from "./components/HoroscopeView";
+import { LegalFooter } from "./components/LegalFooter";
 import { MoodBackground } from "./components/MoodBackground";
 import { MoodInput } from "./components/MoodInput";
 import { WallpaperButton } from "./components/WallpaperButton";
@@ -169,6 +170,7 @@ function App() {
           />
         )}
       </AnimatePresence>
+      <LegalFooter />
     </main>
   );
 }
