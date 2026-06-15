@@ -1,0 +1,143 @@
+.app {
+  padding-bottom: max(116px, calc(env(safe-area-inset-bottom) + 96px));
+}
+
+.legal-footer {
+  align-items: center;
+  backdrop-filter: blur(24px) saturate(1.25);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 22px;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  box-shadow:
+    0 18px 60px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+  left: 50%;
+  max-width: min(920px, calc(100% - 28px));
+  padding: 10px 12px 10px 16px;
+  position: fixed;
+  transform: translateX(-50%);
+  width: max-content;
+  z-index: 8;
+}
+
+.legal-footer > p {
+  font-size: 0.72rem;
+  line-height: 1.35;
+  margin: 0;
+  max-width: 430px;
+  opacity: 0.72;
+}
+
+.legal-footer nav {
+  align-items: center;
+  display: flex;
+  gap: 5px;
+}
+
+.legal-footer button {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  color: currentColor;
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 800;
+  min-height: 32px;
+  padding: 0 11px;
+  transition:
+    background 180ms ease,
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.legal-footer button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.legal-footer button:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.78);
+  outline-offset: 4px;
+}
+
+.legal-footer-panel {
+  backdrop-filter: blur(30px) saturate(1.25);
+  background: rgba(8, 13, 28, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
+  bottom: calc(100% + 10px);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+  display: grid;
+  gap: 14px;
+  left: 0;
+  padding: 16px;
+  position: absolute;
+  width: min(100%, 680px);
+}
+
+.legal-footer-panel h2 {
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  font-size: 1.25rem;
+  line-height: 1.1;
+  margin: 0 0 10px;
+}
+
+.legal-footer-panel p {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  margin: 0;
+  opacity: 0.78;
+}
+
+.legal-footer-panel p + p {
+  margin-top: 8px;
+}
+
+.legal-footer-panel > button {
+  justify-self: start;
+}
+
+@media (max-width: 620px) {
+  .app {
+    padding-bottom: max(142px, calc(env(safe-area-inset-bottom) + 124px));
+  }
+
+  .content-shell {
+    min-height: calc(100svh - 142px);
+  }
+
+  .legal-footer {
+    align-items: stretch;
+    border-radius: 20px;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    width: calc(100% - 24px);
+  }
+
+  .legal-footer > p {
+    font-size: 0.68rem;
+    max-width: none;
+    text-align: center;
+  }
+
+  .legal-footer nav {
+    justify-content: center;
+  }
+
+  .legal-footer nav button {
+    flex: 1;
+    padding-inline: 8px;
+  }
+
+  .legal-footer-panel {
+    bottom: calc(100% + 8px);
+    max-height: min(58svh, 430px);
+    overflow-y: auto;
+    width: 100%;
+  }
+}
